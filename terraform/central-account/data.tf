@@ -29,6 +29,7 @@ data "template_file" "consoleme_config" {
     application_admin                                  = var.application_admin
     region                                             = data.aws_region.current.name
     jwt_email_key                                      = var.lb-authentication-jwt-email-key
+    jwt_groups_key                                     = var.lb-authentication-jwt-groups-key
     user_facing_url                                    = var.user_facing_url == "" ? "https://${aws_lb.public-to-private-lb.dns_name}:${var.lb_port}" : var.user_facing_url
     logout_url                                         = var.logout_url
   }
@@ -43,5 +44,6 @@ data "template_file" "consoleme_userdata" {
     CONFIG_LOCATION         = "/apps/consoleme/example_config/example_config_terraform.yaml"
     CONSOLEME_CONFIG_S3     = format("s3://%s/%s", aws_s3_bucket.consoleme_files_bucket.id, aws_s3_bucket_object.consoleme_config.id)
     custom_user_data_script = var.custom_user_data_script
+    consoleme_repo          = var.consoleme_repo
   }
 }

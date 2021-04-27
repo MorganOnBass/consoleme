@@ -6,6 +6,8 @@ import _ from "lodash";
 const DataTableColumnsComponent = ({
   column,
   data,
+  totalCount,
+  filteredCount,
   direction,
   filters,
   filterColumn,
@@ -47,17 +49,19 @@ const DataTableColumnsComponent = ({
     // - Sort the filteredData list by the name of column a user clicked.
     // - Keep track of which column was clicked for sorting.
     // - Keep track of sorting order last time it was used.
+    let sortedData = {
+      totalCount: totalCount,
+      filteredCount: filteredCount,
+    };
     if (column !== clickedColumn) {
-      setFilteredData(
-        _.sortBy(filteredData, [clickedColumn]),
-        "ascending",
-        clickedColumn
-      );
+      sortedData.data = _.sortBy(filteredData, [clickedColumn]);
+      setFilteredData(sortedData, "ascending", clickedColumn);
     } else {
+      sortedData.data = filteredData.reverse();
       setFilteredData(
-        filteredData.reverse(),
+        sortedData,
         direction === "ascending" ? "descending" : "ascending",
-        null
+        clickedColumn
       );
     }
   };
@@ -197,7 +201,11 @@ const DataTableColumnsComponent = ({
         onClick={() => {
           handleSort(key, column, filteredData, direction);
         }}
-        sorted={!["button"].includes(item.type) ? direction : null}
+        sorted={
+          column === item.key && !["button"].includes(item.type)
+            ? direction
+            : null
+        }
         textAlign={item.type === "button" ? "center" : null}
       >
         {columnCell}

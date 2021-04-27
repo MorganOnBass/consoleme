@@ -9,6 +9,7 @@ import {
   Segment,
   Table,
 } from "semantic-ui-react";
+import DataTableActionsComponent from "./DataTableActionsComponent";
 import DataTableColumnsComponent from "./DataTableColumnsComponent";
 import DataTableRowsComponent from "./DataTableRowsComponent";
 
@@ -25,6 +26,8 @@ const DataTableComponent = ({ config }) => {
     expandedRow = null,
     filteredData = [],
     filters = {},
+    totalCount = 0,
+    filteredCount = 0,
     isLoading = true,
     redirect = false,
     tableConfig = {},
@@ -73,10 +76,15 @@ const DataTableComponent = ({ config }) => {
           <p>{warningMessage}</p>
         </Message>
       ) : null}
-      <Table collapsing sortable celled compact selectable striped>
+
+      <DataTableActionsComponent filters={filters} tableConfig={tableConfig} />
+
+      <Table sortable celled compact selectable striped>
         <DataTableColumnsComponent
           column={column}
           data={data}
+          totalCount={totalCount}
+          filteredCount={filteredCount}
           direction={direction}
           filters={filters}
           filterColumn={filterColumn}
@@ -98,22 +106,37 @@ const DataTableComponent = ({ config }) => {
         </Table.Body>
         <Table.Footer>
           <Table.Row>
-            <Table.HeaderCell
-              collapsing
-              colSpan={calculateColumnSize(tableConfig)}
-            >
-              {totalPages > 0 ? (
-                <Pagination
-                  floated="right"
-                  activePage={activePage}
-                  totalPages={totalPages}
-                  onPageChange={(event, data) => {
-                    setActivePage(data.activePage);
-                  }}
-                />
-              ) : (
-                ""
-              )}
+            <Table.HeaderCell colSpan={calculateColumnSize(tableConfig)}>
+              <div
+                style={{
+                  alignItems: "center",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginRight: "1em",
+                }}
+              >
+                <div>
+                  {filteredCount !== totalCount ? (
+                    <>
+                      {filteredCount.toLocaleString()} Results (Filtered from{" "}
+                      {totalCount.toLocaleString()})
+                    </>
+                  ) : (
+                    <>{filteredCount.toLocaleString()} Results</>
+                  )}
+                </div>
+                {totalPages > 0 ? (
+                  <Pagination
+                    activePage={activePage}
+                    totalPages={totalPages}
+                    onPageChange={(event, data) => {
+                      setActivePage(data.activePage);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+              </div>
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>
